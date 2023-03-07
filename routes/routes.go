@@ -18,5 +18,4 @@ func welcome(c *gin.Context) {
 		"message": "Welcome To API",
 	},
 	)
-	return
 }

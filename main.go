@@ -13,6 +13,12 @@ func init() {
 	initializers.LoadEnvVariables()
 	initializers.ConnectToDB()
 	initializers.DB.AutoMigrate(&models.User{})
+	initializers.DB.AutoMigrate(&models.Announcement{})
+	initializers.DB.AutoMigrate(&models.Attendance{})
+	initializers.DB.AutoMigrate(&models.Leave{})
+	initializers.DB.AutoMigrate(&models.Payroll{})
+	initializers.DB.AutoMigrate(&models.Reimburse{})
+
 }
 
 func CORSMiddleware() gin.HandlerFunc {
