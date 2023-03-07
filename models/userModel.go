@@ -1,16 +1,13 @@
 package models
 
-import "time"
+import "gorm.io/gorm"
 
-// import "gorm.io/gorm"
 
 type User struct {
-	ID        uint `gorm:"primaryKey"`
-	CreatedAt time.Time
-	// gorm.Model       // id, created at, and deleted at
-	Username         string
+	gorm.Model       
+	Username         string 
 	FullName         string
-	Email            string
+	Email            string 
 	PhoneNumber      int
 	Password         string
 	Division         string
@@ -19,4 +16,7 @@ type User struct {
 	ContractDocument string
 	CVDocument       string
 	ProfilePhoto     string
+	Role 	    	 string
+	Identifier 		 bool
+	Attendance 		[]Attendance
 }
