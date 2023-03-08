@@ -10,6 +10,7 @@ import (
 func Routes(router *gin.Engine) {
 	router.GET("/", welcome)
 	router.POST("/create-user", controllers.CreateUser)
+	router.POST("/login", controllers.Login)
 }
 
 func welcome(c *gin.Context) {
