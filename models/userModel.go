@@ -8,11 +8,11 @@ import (
 
 type User struct {
 	// gorm.Model
-	Id             uint `gorm:"primaryKey"` //blm implement id plabs
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	DeletedAt      gorm.DeletedAt `gorm:"index"`
-	Username       string
+	Id        uint `gorm:"primaryKey"` //blm implement id plabs
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	// Username       string
 	Name           string `gorm:"not null"`
 	BornDay        time.Time
 	IdentityNumber int
@@ -22,8 +22,8 @@ type User struct {
 	Github         string
 	Gitlab         string
 	//bank acc belom
-	Phone    int `gorm:"not null"`
-	Password string
+	Phone    int    `gorm:"not null"`
+	Password string `gorm:"not null"`
 	// Division string
 	Position string `gorm:"not null"`
 	Status   bool   `gorm:"not null"`
