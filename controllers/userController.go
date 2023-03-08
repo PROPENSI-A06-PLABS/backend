@@ -27,17 +27,17 @@ func CreateUser(c *gin.Context) {
 	c.Bind(&body)
 
 	newUser := models.User{
-		Username:         body.Username,
-		FullName:         body.FullName,
-		Email:            body.Email,
-		PhoneNumber:      body.PhoneNumber,
-		Password:         body.Password,
-		Division:         body.Division,
-		Status:           body.Status,
-		BaseSalary:       body.BaseSalary,
-		ContractDocument: body.ContractDocument,
-		CVDocument:       body.CVDocument,
-		ProfilePhoto:     body.ProfilePhoto,
+		// Username:         body.Username,
+		// FullName:         body.FullName,
+		// Email:            body.Email,
+		// PhoneNumber:      body.PhoneNumber,
+		// Password:         body.Password,
+		// Division:         body.Division,
+		// Status:           body.Status,
+		// BaseSalary:       body.BaseSalary,
+		// ContractDocument: body.ContractDocument,
+		// CVDocument:       body.CVDocument,
+		// ProfilePhoto:     body.ProfilePhoto,
 	}
 
 	result := initializers.DB.Create(&newUser)
