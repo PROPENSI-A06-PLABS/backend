@@ -19,6 +19,10 @@ func Routes(router *gin.Engine) {
 	router.POST("/login", controllers.Login)
 	router.POST("/logout", middleware.RequireAuth, controllers.Logout)
 	router.GET("/validate", middleware.RequireAuth, controllers.Validate)
+	router.POST("/create-attendance", controllers.CheckIn)
+	router.GET("/get-attendance", controllers.GetAllAttendance)
+	router.GET("/get-attendance/:id", controllers.GetUserAttendance)
+	// router.POST("/create-attendance", controllers.CheckIn)
 }
 
 func welcome(c *gin.Context) {
