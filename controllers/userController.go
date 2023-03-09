@@ -3,29 +3,48 @@ package controllers
 import (
 	"attendance-payroll-app/initializers"
 	"attendance-payroll-app/models"
+	// "attendance-payroll-app/services"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/go-playground/validator/v10"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
+func UpdateUser(c *gin.Context){
+	id := c.Param("id")
+	user := models.User{}
+	db_user := models.User{}
+
+	c.Bind(&user) // from fe
+
+	initializers.DB.First(&db_user,id) // from database
+	initializers.DB.Model(&db_user).Updates(user)
+	
+}
+
+
+func DeleteUser(c *gin.Context){
+	id := c.Param("id")
+	user := models.User{}
+	initializers.DB.Delete(&user, id)
+	c.Status(200)
+}
+
+func RetriveUsers(c *gin.Context){
+	// get all data users
+	users := []models.User{}
+	initializers.DB.Find(&users)
+	c.JSON(http.StatusOK, users)
+}
+
 func CreateUser(c *gin.Context) {
 	// get data from body
-	var body struct {
-		Name         string
-		Email        string
-		Phone        int
-		Password     string
-		Position     string
-		Status       bool
-		StartWork    time.Time
-		Tenure       string
-		ContractType string
-		GrossSalary  int
-	}
+	body := models.User{}
 
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -46,21 +65,20 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// create user
-	newUser := models.User{
-		Name:         body.Name,
-		Email:        body.Email,
-		Phone:        body.Phone,
-		Password:     string(hash),
-		Position:     body.Position,
-		Status:       body.Status,
-		StartWork:    body.StartWork,
-		Tenure:       body.Tenure,
-		ContractType: body.ContractType,
-		GrossSalary:  body.GrossSalary,
+	// validate input
+	validate := validator.New()
+	err = validate.Struct(body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+
+		return
 	}
 
-	result := initializers.DB.Create(&newUser)
+	// create user
+	body.Password = string(hash)
+	result := initializers.DB.Create(&body)
 
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -72,9 +90,20 @@ func CreateUser(c *gin.Context) {
 
 	//return
 	c.JSON(http.StatusOK, gin.H{
-		"user": newUser,
+		"user": body,
 	})
 }
+
+// func CreateUser(c *gin.Context) {
+// 	user, err, status := services.CreateUser(c)
+// 	if (err != ""){
+// 		c.JSON(status, gin.H{
+// 			"message": err,
+// 		})
+// 	} else{
+// 		c.JSON(status, user)
+// 	}
+// }
 
 func Login(c *gin.Context) {
 	// get email and password
