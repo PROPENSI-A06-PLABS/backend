@@ -124,25 +124,35 @@ func Login(c *gin.Context) {
 	// generate jwt token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.Id,
-		"nbf": time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(), // 30 hari
 	})
 
 	// sign the token
-	tokenString, err := token.SignedString(os.Getenv("SECRET"))
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Invalid to create token",
+			"message": "Failed to create token",
 		})
 
 		return
 	}
-	// send data
+	// send it back
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true) // 1hour*24*30 = 30 hari
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
 	})
 }
 
-func Logout(c *gin.Context) {
+func Validate(c *gin.Context) {
+	user, _ := c.Get("user")
 
+	c.JSON(http.StatusOK, gin.H{
+		"message": user,
+	})
+}
+
+func Logout(c *gin.Context) {
+	c.SetCookie("Authorization", "", -1, "", "", false, true)
 }
