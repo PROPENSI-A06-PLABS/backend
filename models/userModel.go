@@ -8,48 +8,56 @@ import (
 
 type User struct {
 	// gorm.Model
-	Id        uint `gorm:"primaryKey"` //blm implement id plabs
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
-	// Username       string
-	Name           string `gorm:"not null"`
-	BornDay        time.Time
-	IdentityNumber int
-	AddressDetail  string
-	Email          string `gorm:"not null"`
-	PLABSMail      string
-	Github         string
-	Gitlab         string
-	//bank acc belom
-	Phone    int    `gorm:"not null"`
-	Password string `gorm:"not null"`
-	// Division string
-	Position string `gorm:"not null"`
-	Status   bool   `gorm:"not null"`
-	// BaseSalary       int
-	Role               string
-	Identifier         bool
-	StartWork          time.Time `gorm:"not null"`
-	Tenure             string    `gorm:"not null"`
-	ContractType       string    `gorm:"not null"`
-	GrossSalary        int       `gorm:"not null"`
-	NPWP               string
-	JKN_KIS            int
-	KPJ                int
-	KTPDocument        string
-	NPWPDocument       string
-	CVDocument         string
-	ContractDocument   string
-	ProfilePhoto       string
-	ExtraInfo          string
-	Attendance         []Attendance   `gorm:"foreignKey:UserID"`
-	ApprovedAttendance []Attendance   `gorm:"foreignKey:ApproverID"`
-	Leave              []Leave        `gorm:"foreignKey:UserID"`
-	ApprovedLeave      []Leave        `gorm:"foreignKey:ApproverID"`
-	Payroll            []Payroll      `gorm:"foreignKey:UserID"`
-	ApprovedPayroll    []Payroll      `gorm:"foreignKey:ApproverID"`
-	Reimburse          []Reimburse    `gorm:"foreignKey:UserID"`
-	ApprovedReimburse  []Reimburse    `gorm:"foreignKey:ApproverID"`
-	Announcement       []Announcement `gorm:"foreignKey:UserID"`
+	Id        			uint 			`gorm:"primaryKey"` //blm implement id plabs
+	CreatedAt 			time.Time  		
+	UpdatedAt 			time.Time  		
+	DeletedAt 			gorm.DeletedAt 	`gorm:"index"`
+	
+	// section 1
+	Name           		string 			`gorm:"not null" json:"Name" validate:"required"`
+	Phone    			int    			`gorm:"not null" json:"Phone" validate:"required"`
+	Email          		string 			`gorm:"not null" json:"Email" validate:"required,email"` 
+	BornDay        		time.Time 		
+	AddressDetail  		string			
+	IdentityNumber 		int		
+
+	// section 2
+	AccountNumer 		int 			// no rek
+	NPWP               	string
+	KPJ                	int				
+	Github         		string			
+	BankName 			string
+	JKN_KIS            	int				
+	Gitlab         		string		
+	ExtraInfo          	string			
+
+	// section 3
+	PLABSMail      		string			
+	Position 			string 			`gorm:"not null" json:"Position" validate:"required"`
+	GrossSalary       	int       		`gorm:"not null" json:"GrossSalary" validate:"required"`
+	Role               	string			`gorm:"not null" json:"Role" validate:"required,eq=ADMIN|eq=MANAGER|eq=HR|eq=STAFF"`
+	ContractType       	string    		`gorm:"not null" json:"ContractType" validate:"required"`
+	Password 			string 			`gorm:"not null" json:"Password" validate:"required,min=7"`
+	StartWork          	time.Time 		`gorm:"not null" json:"StartWork" validate:"required"`
+	Status   			bool   			`gorm:"not null"`  // active - inactive
+
+	// document
+	NPWPDocument       string			
+	KTPDocument        string			
+	CVDocument         string			
+	ContractDocument   string			
+	ProfilePhoto       string			
+
+	// additional
+	Identifier         bool				
+	Tenure             string    		`gorm:"not null"`
+	Attendance         []Attendance   	`gorm:"foreignKey:UserID"`
+	ApprovedAttendance []Attendance   	`gorm:"foreignKey:ApproverID"`
+	Leave              []Leave        	`gorm:"foreignKey:UserID"`
+	ApprovedLeave      []Leave        	`gorm:"foreignKey:ApproverID"`
+	Payroll            []Payroll      	`gorm:"foreignKey:UserID"`
+	ApprovedPayroll    []Payroll      	`gorm:"foreignKey:ApproverID"`
+	Reimburse          []Reimburse    	`gorm:"foreignKey:UserID"`
+	ApprovedReimburse  []Reimburse    	`gorm:"foreignKey:ApproverID"`
+	Announcement       []Announcement 	`gorm:"foreignKey:UserID"`
 }

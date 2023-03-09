@@ -3,6 +3,9 @@ package controllers
 import (
 	"attendance-payroll-app/initializers"
 	"attendance-payroll-app/models"
+	"attendance-payroll-app/services"
+
+	// "attendance-payroll-app/services"
 	"net/http"
 	"os"
 	"time"
@@ -12,68 +15,41 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func UpdateUser(c *gin.Context) {
+	id := c.Param("id")
+	user := models.User{}
+	db_user := models.User{}
+
+	c.Bind(&user) // from fe
+
+	initializers.DB.First(&db_user, id) // from database
+	initializers.DB.Model(&db_user).Updates(user)
+
+}
+
+func DeleteUser(c *gin.Context) {
+	id := c.Param("id")
+	user := models.User{}
+	initializers.DB.Delete(&user, id)
+	c.Status(200)
+}
+
+func RetrieveUsers(c *gin.Context) {
+	// get all data users
+	users := []models.User{}
+	initializers.DB.Find(&users)
+	c.JSON(http.StatusOK, users)
+}
+
 func CreateUser(c *gin.Context) {
-	// get data from body
-	var body struct {
-		Name         string
-		Email        string
-		Phone        int
-		Password     string
-		Position     string
-		Status       bool
-		StartWork    time.Time
-		Tenure       string
-		ContractType string
-		GrossSalary  int
-	}
-
-	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to read body",
+	user, err, status := services.CreateUser(c)
+	if err != "" {
+		c.JSON(status, gin.H{
+			"message": err,
 		})
-
-		return
+	} else {
+		c.JSON(status, user)
 	}
-
-	// hash password
-	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to hash password",
-		})
-
-		return
-	}
-
-	// create user
-	newUser := models.User{
-		Name:         body.Name,
-		Email:        body.Email,
-		Phone:        body.Phone,
-		Password:     string(hash),
-		Position:     body.Position,
-		Status:       body.Status,
-		StartWork:    body.StartWork,
-		Tenure:       body.Tenure,
-		ContractType: body.ContractType,
-		GrossSalary:  body.GrossSalary,
-	}
-
-	result := initializers.DB.Create(&newUser)
-
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to create user",
-		})
-
-		return
-	}
-
-	//return
-	c.JSON(http.StatusOK, gin.H{
-		"user": newUser,
-	})
 }
 
 func Login(c *gin.Context) {

@@ -10,7 +10,12 @@ import (
 
 func Routes(router *gin.Engine) {
 	router.GET("/", welcome)
-	router.POST("/create-user", controllers.CreateUser)
+	// CRUD user
+	router.GET("/retrieve-users", middleware.RequireAuth, controllers.RetrieveUsers)
+	router.POST("/create-user", middleware.RequireAuth, controllers.CreateUser)
+	router.DELETE("/delete-user/:id", middleware.RequireAuth, controllers.DeleteUser)
+	router.PUT("/update-user/:id", middleware.RequireAuth, controllers.UpdateUser)
+
 	router.POST("/login", controllers.Login)
 	router.POST("/logout", middleware.RequireAuth, controllers.Logout)
 	router.GET("/validate", middleware.RequireAuth, controllers.Validate)
