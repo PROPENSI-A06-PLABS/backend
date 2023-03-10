@@ -24,7 +24,6 @@ func UpdateUser(c *gin.Context) {
 
 	initializers.DB.First(&db_user, id) // from database
 	initializers.DB.Model(&db_user).Updates(user)
-
 }
 
 func DeleteUser(c *gin.Context) {
@@ -76,16 +75,6 @@ func Login(c *gin.Context) {
 		})
 	}
 
-	// if err != nil {
-	// 	c.JSON(http.StatusNotFound, gin.H{
-	// 		"message": "not found",
-	// 	})
-	// } else {
-	// 	c.JSON(http.StatusOK, gin.H{
-	// 		"user": user,
-	// 	})
-	// }
-
 	// compare pass with saved pass
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 
@@ -100,7 +89,9 @@ func Login(c *gin.Context) {
 	// generate jwt token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.Id,
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(), // 30 hari
+		// "exp": time.Now().Add(time.Hour * 24 * 30).Unix(), // 30 hari
+		// "exp": time.Now().Add(time.Minute * 5).Unix(), // 5 menit
+		"exp": time.Now().Add(time.Hour * 12).Unix(), // 12 jam
 	})
 
 	// sign the token
@@ -115,7 +106,8 @@ func Login(c *gin.Context) {
 	}
 	// send it back
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true) // 1hour*24*30 = 30 hari
+	// c.Set("Authorization", tokenString)
+	// c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true) // 1hour*24*30 = 30 hari
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
 	})
