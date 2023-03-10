@@ -4,6 +4,8 @@ import (
 	"attendance-payroll-app/initializers"
 	"attendance-payroll-app/models"
 	"attendance-payroll-app/services"
+	"encoding/json"
+	"io/ioutil"
 
 	// "attendance-payroll-app/services"
 	"net/http"
@@ -15,16 +17,96 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func UpdateUser(c *gin.Context) {
+func DeactivateUsers(c *gin.Context){
+	type UserId struct{
+		ID int
+	}
+
+	// get all input
+	respBody , _ := ioutil.ReadAll(c.Request.Body)
+	var body []map[string]int
+	json.Unmarshal(respBody, &body)
+
+	users := []models.User{}
+
+	for _ , value := range body{
+		user := models.User{}
+		initializers.DB.First(&user, value["Id"])
+		status := false
+		initializers.DB.Model(&user).Update("status", status)
+		user.Status = status
+		users = append(users, user)
+	}
+	c.JSON(200,users)
+}
+
+func ActivateUsers(c *gin.Context){
+	type UserId struct{
+		ID int
+	}
+
+	// get all input
+	respBody , _ := ioutil.ReadAll(c.Request.Body)
+	var body []map[string]int
+	json.Unmarshal(respBody, &body)
+
+	users := []models.User{}
+
+	for _ , value := range body{
+		user := models.User{}
+		initializers.DB.First(&user, value["Id"])
+		status := true
+		initializers.DB.Model(&user).Update("status", status)
+		user.Status = status
+		users = append(users, user)
+	}
+	c.JSON(200,users)
+}
+
+func DeleteUsers(c *gin.Context){
+	type UserId struct{
+		ID int
+	}
+
+	respBody , _ := ioutil.ReadAll(c.Request.Body)
+	var body []map[string]int
+	json.Unmarshal(respBody, &body)
+
+	for _, value := range body{
+		userModel := models.User{}
+		initializers.DB.Delete(&userModel, value["Id"])
+	}
+	c.Status(200)
+}
+
+func ChangeStatus(c *gin.Context){
 	id := c.Param("id")
 	user := models.User{}
-	db_user := models.User{}
+	initializers.DB.First(&user, id)
+	status := user.Status
+	initializers.DB.Model(&user).Update("status", !status)
+	user.Status = !status
+	c.JSON(http.StatusOK, user)
+}
 
-	c.Bind(&user) // from fe
+// belum jadi
+func UpdateUser(c *gin.Context) {
+	id := c.Param("id")
 
-	initializers.DB.First(&db_user, id) // from database
-	initializers.DB.Model(&db_user).Updates(user)
+	// get user by id
+	user := models.User{}
+	initializers.DB.First(&user, id)
 
+	// get user input
+	input := models.User{}
+	c.Bind(&input)
+
+
+	// db_user := models.User{}
+	// c.Bind(&user) // from fe
+	// initializers.DB.First(&db_user, id) // from database
+	// initializers.DB.Model(&db_user).Updates(user)
+	// c.JSON(http.StatusOK, user)
 }
 
 func DeleteUser(c *gin.Context) {
@@ -39,6 +121,13 @@ func RetrieveUsers(c *gin.Context) {
 	users := []models.User{}
 	initializers.DB.Find(&users)
 	c.JSON(http.StatusOK, users)
+}
+
+func RetrieveUser(c *gin.Context){
+	id := c.Param("id")
+	user := models.User{}
+	initializers.DB.Find(&user, id)
+	c.JSON(http.StatusOK, user)
 }
 
 func CreateUser(c *gin.Context) {
