@@ -10,8 +10,7 @@ import (
 
 func Routes(router *gin.Engine) {
 	router.GET("/", welcome)
-	// CRUD user
-	// middleware.RequireAuth,
+
 	userRouter := router.Group("/user")
 	{
 		userRouter.GET("/retrieve-users", controllers.RetrieveUsers)
