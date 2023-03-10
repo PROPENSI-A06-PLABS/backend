@@ -15,14 +15,14 @@ type User struct {
 	
 	// section 1
 	Name           		string 			`gorm:"not null" json:"Name" validate:"required"`
-	Phone    			int    			`gorm:"not null" json:"Phone" validate:"required"`
+	Phone    			string    		`gorm:"not null" json:"Phone" validate:"required"`
 	Email          		string 			`gorm:"not null" json:"Email" validate:"required,email"` 
 	BornDay        		time.Time 		
 	AddressDetail  		string			
 	IdentityNumber 		int		
 
 	// section 2
-	AccountNumer 		int 			// no rek
+	AccountNumber 		int 			// no rek
 	NPWP               	string
 	KPJ                	int				
 	Github         		string			

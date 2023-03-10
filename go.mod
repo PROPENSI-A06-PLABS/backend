@@ -3,6 +3,7 @@ module attendance-payroll-app
 go 1.20
 
 require (
+	github.com/dongri/phonenumber v0.0.0-20230202225648-47b8ee687b9f
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang-jwt/jwt/v5 v5.0.0-rc.1
