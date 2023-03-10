@@ -3,6 +3,7 @@ module attendance-payroll-app
 go 1.20
 
 require (
+	github.com/dongri/phonenumber v0.0.0-20230202225648-47b8ee687b9f
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang-jwt/jwt/v5 v5.0.0-rc.1
@@ -17,7 +18,6 @@ require (
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/creack/pty v1.1.18 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dongri/phonenumber v0.0.0-20230202225648-47b8ee687b9f // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
