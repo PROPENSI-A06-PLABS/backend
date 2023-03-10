@@ -4,132 +4,112 @@ import (
 	"attendance-payroll-app/initializers"
 	"attendance-payroll-app/models"
 	"attendance-payroll-app/services"
-	"encoding/json"
-	"io/ioutil"
-
-	// "attendance-payroll-app/services"
 	"net/http"
 	"os"
 	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
+// deactivate multiple users
 func DeactivateUsers(c *gin.Context){
-	type UserId struct{
-		ID int
+	users, err, status := services.DeactivateUsers(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, users)
 	}
-
-	// get all input
-	respBody , _ := ioutil.ReadAll(c.Request.Body)
-	var body []map[string]int
-	json.Unmarshal(respBody, &body)
-
-	users := []models.User{}
-
-	for _ , value := range body{
-		user := models.User{}
-		initializers.DB.First(&user, value["Id"])
-		status := false
-		initializers.DB.Model(&user).Update("status", status)
-		user.Status = status
-		users = append(users, user)
-	}
-	c.JSON(200,users)
 }
 
+// activate multiple users
 func ActivateUsers(c *gin.Context){
-	type UserId struct{
-		ID int
+	users , err , status := services.ActivateUsers(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, users)
 	}
-
-	// get all input
-	respBody , _ := ioutil.ReadAll(c.Request.Body)
-	var body []map[string]int
-	json.Unmarshal(respBody, &body)
-
-	users := []models.User{}
-
-	for _ , value := range body{
-		user := models.User{}
-		initializers.DB.First(&user, value["Id"])
-		status := true
-		initializers.DB.Model(&user).Update("status", status)
-		user.Status = status
-		users = append(users, user)
-	}
-	c.JSON(200,users)
 }
 
+// delete multiple users
 func DeleteUsers(c *gin.Context){
-	type UserId struct{
-		ID int
+	err, status := services.DeleteUsers(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.Status(status)
 	}
-
-	respBody , _ := ioutil.ReadAll(c.Request.Body)
-	var body []map[string]int
-	json.Unmarshal(respBody, &body)
-
-	for _, value := range body{
-		userModel := models.User{}
-		initializers.DB.Delete(&userModel, value["Id"])
-	}
-	c.Status(200)
 }
 
+// change user status by id (negasi)
 func ChangeStatus(c *gin.Context){
-	id := c.Param("id")
-	user := models.User{}
-	initializers.DB.First(&user, id)
-	status := user.Status
-	initializers.DB.Model(&user).Update("status", !status)
-	user.Status = !status
-	c.JSON(http.StatusOK, user)
+	user, err, status := services.ChangeStatus(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, user)
+	}
 }
 
-// belum jadi
+// update user attribute by id
 func UpdateUser(c *gin.Context) {
-	id := c.Param("id")
-
-	// get user by id
-	user := models.User{}
-	initializers.DB.First(&user, id)
-
-	// get user input
-	input := models.User{}
-	c.Bind(&input)
-
-
-	// db_user := models.User{}
-	// c.Bind(&user) // from fe
-	// initializers.DB.First(&db_user, id) // from database
-	// initializers.DB.Model(&db_user).Updates(user)
-	// c.JSON(http.StatusOK, user)
+	user , err , status := services.UpdateUser(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, user)
+	}
 }
 
+// delete user by id
 func DeleteUser(c *gin.Context) {
-	id := c.Param("id")
-	user := models.User{}
-	initializers.DB.Delete(&user, id)
-	c.Status(200)
+	err, status := services.DeleteUser(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.Status(200)
+	}
 }
 
+// get all users
 func RetrieveUsers(c *gin.Context) {
-	// get all data users
-	users := []models.User{}
-	initializers.DB.Find(&users)
-	c.JSON(http.StatusOK, users)
+	users, err , status := services.RetrieveUsers(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, users)
+	}
+	
 }
 
+// get user by id
 func RetrieveUser(c *gin.Context){
-	id := c.Param("id")
-	user := models.User{}
-	initializers.DB.Find(&user, id)
-	c.JSON(http.StatusOK, user)
+	user, err , status := services.RetrieveUser(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, user)
+	}
 }
 
+// create user
 func CreateUser(c *gin.Context) {
 	user, err, status := services.CreateUser(c)
 	if err != "" {
