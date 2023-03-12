@@ -3,19 +3,20 @@ package controllers
 import (
 	"attendance-payroll-app/initializers"
 	"attendance-payroll-app/models"
-	"net/http"
-	"time"
 	"attendance-payroll-app/services"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"time"
 )
 
 func CheckIn(c *gin.Context) {
 	// get data from body
 	var body struct {
-		CheckinTime		time.Time
-		Date 					time.Time
-		UserID       	uint
-		ApproverID  	*uint
+		CheckinTime time.Time
+		Date        time.Time
+		UserID      uint
+		ApproverID  *uint
+		Location    string
 	}
 
 	if c.Bind(&body) != nil {
@@ -30,10 +31,11 @@ func CheckIn(c *gin.Context) {
 
 	// create attendance
 	newAttendance := models.Attendance{
-		CheckinTime: 		checkinTime,
-		Date: 					checkinTime,
-		UserID: 				body.UserID,
-		ApproverID:    	nil, 
+		CheckinTime: checkinTime,
+		Date:        checkinTime,
+		UserID:      body.UserID,
+		ApproverID:  nil,
+		Location:    body.Location,
 	}
 
 	result := initializers.DB.Create(&newAttendance)
@@ -105,7 +107,7 @@ func CheckOut(c *gin.Context) {
 }
 
 func UpdateAttendance(c *gin.Context) {
-	attendance , err , status := services.UpdateAttendance(c)
+	attendance, err, status := services.UpdateAttendance(c)
 	if err != nil {
 		c.JSON(status, gin.H{
 			"message": err.Error(),

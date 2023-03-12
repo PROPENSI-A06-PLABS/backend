@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,16 +14,18 @@ import (
 )
 
 func RequireAuth(c *gin.Context) {
-	// get cookie of req
-	tokenString, err := c.Cookie("Authorization")
+	// // get cookie of req
+	// tokenString, err := c.Cookie("Authorization")
+	// log.Fatal(c.Request.Header["Authorization"])
+	tokenString := strings.Split(c.Request.Header["Authorization"][0], " ")[1]
+	// log.Fatal(tokenString)
+	// if err != nil {
+	// 	c.AbortWithStatus(http.StatusUnauthorized)
 
-	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
+	// 	return
+	// }
 
-		return
-	}
-
-	// validate
+	// // validate
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -30,6 +33,12 @@ func RequireAuth(c *gin.Context) {
 
 		return []byte(os.Getenv("SECRET")), nil
 	})
+
+	if err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+
+		return
+	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// check the exp

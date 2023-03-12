@@ -7,13 +7,14 @@ import (
 	"net/http"
 	"os"
 	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // deactivate multiple users
-func DeactivateUsers(c *gin.Context){
+func DeactivateUsers(c *gin.Context) {
 	users, err, status := services.DeactivateUsers(c)
 	if err != nil {
 		c.JSON(status, gin.H{
@@ -25,8 +26,8 @@ func DeactivateUsers(c *gin.Context){
 }
 
 // activate multiple users
-func ActivateUsers(c *gin.Context){
-	users , err , status := services.ActivateUsers(c)
+func ActivateUsers(c *gin.Context) {
+	users, err, status := services.ActivateUsers(c)
 	if err != nil {
 		c.JSON(status, gin.H{
 			"message": err.Error(),
@@ -37,7 +38,7 @@ func ActivateUsers(c *gin.Context){
 }
 
 // delete multiple users
-func DeleteUsers(c *gin.Context){
+func DeleteUsers(c *gin.Context) {
 	err, status := services.DeleteUsers(c)
 	if err != nil {
 		c.JSON(status, gin.H{
@@ -49,7 +50,7 @@ func DeleteUsers(c *gin.Context){
 }
 
 // change user status by id (negasi)
-func ChangeStatus(c *gin.Context){
+func ChangeStatus(c *gin.Context) {
 	user, err, status := services.ChangeStatus(c)
 	if err != nil {
 		c.JSON(status, gin.H{
@@ -62,7 +63,7 @@ func ChangeStatus(c *gin.Context){
 
 // update user attribute by id
 func UpdateUser(c *gin.Context) {
-	user , err , status := services.UpdateUser(c)
+	user, err, status := services.UpdateUser(c)
 	if err != nil {
 		c.JSON(status, gin.H{
 			"message": err.Error(),
@@ -86,7 +87,7 @@ func DeleteUser(c *gin.Context) {
 
 // get all users
 func RetrieveUsers(c *gin.Context) {
-	users, err , status := services.RetrieveUsers(c)
+	users, err, status := services.RetrieveUsers(c)
 	if err != nil {
 		c.JSON(status, gin.H{
 			"message": err.Error(),
@@ -94,12 +95,12 @@ func RetrieveUsers(c *gin.Context) {
 	} else {
 		c.JSON(status, users)
 	}
-	
+
 }
 
 // get user by id
-func RetrieveUser(c *gin.Context){
-	user, err , status := services.RetrieveUser(c)
+func RetrieveUser(c *gin.Context) {
+	user, err, status := services.RetrieveUser(c)
 	if err != nil {
 		c.JSON(status, gin.H{
 			"message": err.Error(),
@@ -145,16 +146,6 @@ func Login(c *gin.Context) {
 		})
 	}
 
-	// if err != nil {
-	// 	c.JSON(http.StatusNotFound, gin.H{
-	// 		"message": "not found",
-	// 	})
-	// } else {
-	// 	c.JSON(http.StatusOK, gin.H{
-	// 		"user": user,
-	// 	})
-	// }
-
 	// compare pass with saved pass
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 
@@ -169,7 +160,9 @@ func Login(c *gin.Context) {
 	// generate jwt token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.Id,
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(), // 30 hari
+		// "exp": time.Now().Add(time.Hour * 24 * 30).Unix(), // 30 hari
+		// "exp": time.Now().Add(time.Minute * 5).Unix(), // 5 menit
+		"exp": time.Now().Add(time.Hour * 12).Unix(), // 12 jam
 	})
 
 	// sign the token
@@ -184,9 +177,11 @@ func Login(c *gin.Context) {
 	}
 	// send it back
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true) // 1hour*24*30 = 30 hari
+	// c.Set("Authorization", tokenString)
+	// c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true) // 1hour*24*30 = 30 hari
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
+		"user":  user,
 	})
 }
 
