@@ -25,13 +25,22 @@ func Routes(router *gin.Engine) {
 		userRouter.POST("/deactivate-users",controllers.DeactivateUsers)
 	}
 
+	dashboardRouter := router.Group("/dashboard")
+	{
+		dashboardRouter.POST("/check-in", controllers.CheckIn)
+		dashboardRouter.POST("/check-out/:id", controllers.CheckOut)
+	}
+
+	attendanceRouter := router.Group("/attendance")
+	{
+		attendanceRouter.PUT("/update-attendance/:id",  controllers.UpdateAttendance)
+	}
+
 	router.POST("/login", controllers.Login)
 	router.POST("/logout", middleware.RequireAuth, controllers.Logout)
 	router.GET("/validate", middleware.RequireAuth, controllers.Validate)
-	router.POST("/create-attendance", controllers.CheckIn)
 	router.GET("/get-attendance", controllers.GetAllAttendance)
 	router.GET("/get-attendance/:id", controllers.GetUserAttendance)
-	// router.POST("/create-attendance", controllers.CheckIn)
 }
 
 func welcome(c *gin.Context) {

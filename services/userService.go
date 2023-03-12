@@ -12,7 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func DeactivateUsers(c *gin.Context) ([]models.User, error, int){
+func DeactivateUsers(c *gin.Context) ([]models.User, error, int) {
 	type UserId struct{
 		ID int
 	}
@@ -52,7 +52,7 @@ func DeactivateUsers(c *gin.Context) ([]models.User, error, int){
 	return users, nil, http.StatusOK
 }
 
-func ActivateUsers(c *gin.Context) ([]models.User, error, int){
+func ActivateUsers(c *gin.Context) ([]models.User, error, int) {
 	type UserId struct{
 		ID int
 	}
@@ -119,7 +119,7 @@ func DeleteUsers(c *gin.Context) (error, int){
 	return nil, http.StatusOK
 }
 
-func ChangeStatus(c *gin.Context) (models.User,error,int){
+func ChangeStatus(c *gin.Context) (models.User,error,int) {
 	// get user by id
 	id := c.Param("id")
 	user := models.User{}
@@ -200,7 +200,7 @@ func UpdateUser(c *gin.Context) (models.User, error, int) {
 	return input, nil, http.StatusOK
 }
 
-func DeleteUser(c *gin.Context) (error, int){
+func DeleteUser(c *gin.Context) (error, int) {
 	// delete user by id
 	id := c.Param("id")
 	user := models.User{}
@@ -222,7 +222,7 @@ func RetrieveUsers(c *gin.Context) ([]models.User, error, int) {
 	return users, nil, http.StatusOK
 }
 
-func RetrieveUser(c *gin.Context) (models.User, error, int){
+func RetrieveUser(c *gin.Context) (models.User, error, int) {
 	// find user by id
 	id := c.Param("id")
 	user := models.User{}
@@ -234,7 +234,7 @@ func RetrieveUser(c *gin.Context) (models.User, error, int){
 	return user, nil, http.StatusOK
 }
 
-func CreateUser(c *gin.Context) (models.User, string, int){
+func CreateUser(c *gin.Context) (models.User, string, int) {
 	// get data from body
 	newUser := models.User{}
 	err := c.Bind(&newUser)
