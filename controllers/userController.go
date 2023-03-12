@@ -181,6 +181,7 @@ func Login(c *gin.Context) {
 	// c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true) // 1hour*24*30 = 30 hari
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
+		"user":  user,
 	})
 }
 
