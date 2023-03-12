@@ -3,21 +3,20 @@ package controllers
 import (
 	"attendance-payroll-app/initializers"
 	"attendance-payroll-app/models"
-	"encoding/json"
-	"fmt"
+	"attendance-payroll-app/services"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 func CheckIn(c *gin.Context) {
 	// get data from body
 	var body struct {
-		CheckinTime		time.Time
-		Date 					time.Time
-		UserID       	uint
-		ApproverID    uint
+		CheckinTime time.Time
+		Date        time.Time
+		UserID      uint
+		ApproverID  *uint
+		Location    string
 	}
 
 	if c.Bind(&body) != nil {
@@ -28,14 +27,15 @@ func CheckIn(c *gin.Context) {
 		return
 	}
 
-	currentDate := time.Now()
+	checkinTime := time.Now()
 
 	// create attendance
 	newAttendance := models.Attendance{
-		CheckinTime: 		currentDate,
-		Date: 					currentDate,
-		UserID: 				body.UserID,	
-		ApproverID: 		body.ApproverID,	
+		CheckinTime: checkinTime,
+		Date:        checkinTime,
+		UserID:      body.UserID,
+		ApproverID:  nil,
+		Location:    body.Location,
 	}
 
 	result := initializers.DB.Create(&newAttendance)
@@ -43,9 +43,8 @@ func CheckIn(c *gin.Context) {
 	var user models.User
 
 	initializers.DB.First(&user, newAttendance.UserID)
-	
 	initializers.DB.Model(&user).Association("Attendance").Append(&newAttendance)
-	initializers.DB.Preload("Attendance").Find(&user, newAttendance.UserID)
+	// initializers.DB.Preload("Attendance").Find(&user, newAttendance.UserID)
 
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -53,15 +52,14 @@ func CheckIn(c *gin.Context) {
 		})
 	}
 
-	//return
-	json, err := json.Marshal(user)
-	if err != nil {
-		fmt.Println("Entering error block")
-	}
-	fmt.Println(string(json))
+	// json, err := json.Marshal(user)
+	// if err != nil {
+	// 	fmt.Println("Entering error block")
+	// }
+	// fmt.Println(string(json))
 
 	c.JSON(http.StatusOK, gin.H{
-		"user": newAttendance,
+		"user": user,
 	})
 }
 
@@ -78,6 +76,43 @@ func GetUserAttendance(c *gin.Context) {
 	c.JSON(http.StatusOK, attendance)
 }
 
-// func CheckOut(c *gin.Context) {
+func CheckOut(c *gin.Context) {
+	var attendance models.Attendance
+	var user models.User
 
-// }
+	id := c.Param("id")
+	initializers.DB.First(&user, id)
+	initializers.DB.Last(&attendance, "user_id=?", id)
+
+	checkoutTime := time.Now()
+
+	// update attendance
+	initializers.DB.Model(&attendance).Updates(
+		models.Attendance{
+			CheckoutTime: checkoutTime,
+		},
+	)
+
+	initializers.DB.Model(&user).Association("Attendance").Append(&attendance)
+
+	// json, err := json.Marshal(user)
+	// if err != nil {
+	// 	fmt.Println("Entering error block")
+	// }
+	// fmt.Println(string(json))
+
+	c.JSON(http.StatusOK, gin.H{
+		"user": user,
+	})
+}
+
+func UpdateAttendance(c *gin.Context) {
+	attendance, err, status := services.UpdateAttendance(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, attendance)
+	}
+}

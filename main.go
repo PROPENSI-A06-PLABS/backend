@@ -18,7 +18,6 @@ func init() {
 	initializers.DB.AutoMigrate(&models.Leave{})
 	initializers.DB.AutoMigrate(&models.Payroll{})
 	initializers.DB.AutoMigrate(&models.Reimburse{})
-
 }
 
 func CORSMiddleware() gin.HandlerFunc {
