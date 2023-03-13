@@ -17,6 +17,7 @@ func CheckIn(c *gin.Context) {
 		UserID      uint
 		ApproverID  *uint
 		Location    string
+		Status      bool
 	}
 
 	if c.Bind(&body) != nil {
@@ -28,6 +29,13 @@ func CheckIn(c *gin.Context) {
 	}
 
 	checkinTime := time.Now()
+	var isOntime bool
+
+	if checkinTime.Hour() < 9 {
+		isOntime = true
+	} else {
+		isOntime = false
+	}
 
 	// create attendance
 	newAttendance := models.Attendance{
@@ -36,6 +44,7 @@ func CheckIn(c *gin.Context) {
 		UserID:      body.UserID,
 		ApproverID:  nil,
 		Location:    body.Location,
+		Status:      isOntime,
 	}
 
 	result := initializers.DB.Create(&newAttendance)
