@@ -4,19 +4,20 @@ import (
 	"attendance-payroll-app/initializers"
 	"attendance-payroll-app/models"
 	"attendance-payroll-app/services"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func CheckIn(c *gin.Context) {
 	// get data from body
 	var body struct {
-		CheckinTime time.Time
-		Date        time.Time
-		UserID      uint
-		ApproverID  *uint
-		Location    string
+		// CheckinTime time.Time
+		// Date        time.Time
+		UserID uint
+		// ApproverID  *uint
+		Location string
 	}
 
 	if c.Bind(&body) != nil {
