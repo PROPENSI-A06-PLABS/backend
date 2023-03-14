@@ -1,119 +1,52 @@
 package controllers
 
 import (
-	"attendance-payroll-app/initializers"
-	"attendance-payroll-app/models"
 	"attendance-payroll-app/services"
-	"net/http"
-	"time"
-
 	"github.com/gin-gonic/gin"
 )
 
 func CheckIn(c *gin.Context) {
-	// get data from body
-	var body struct {
-		// CheckinTime time.Time
-		// Date        time.Time
-		UserID uint
-		// ApproverID  *uint
-		Location string
-		Status      bool
-	}
-
-	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to read body",
+	attendance, err, status := services.CheckIn(c)
+	if err != "" {
+		c.JSON(status, gin.H{
+			"message": err,
 		})
-
-		return
-	}
-
-	checkinTime := time.Now()
-	var isOntime bool
-
-	if checkinTime.Hour() < 9 {
-		isOntime = true
 	} else {
-		isOntime = false
+		c.JSON(status, attendance)
 	}
-
-	// create attendance
-	newAttendance := models.Attendance{
-		CheckinTime: checkinTime,
-		Date:        checkinTime,
-		UserID:      body.UserID,
-		ApproverID:  nil,
-		Location:    body.Location,
-		Status:      isOntime,
-	}
-
-	result := initializers.DB.Create(&newAttendance)
-
-	var user models.User
-
-	initializers.DB.First(&user, newAttendance.UserID)
-	initializers.DB.Model(&user).Association("Attendance").Append(&newAttendance)
-	// initializers.DB.Preload("Attendance").Find(&user, newAttendance.UserID)
-
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to create attendance",
-		})
-	}
-
-	// json, err := json.Marshal(user)
-	// if err != nil {
-	// 	fmt.Println("Entering error block")
-	// }
-	// fmt.Println(string(json))
-
-	c.JSON(http.StatusOK, gin.H{
-		"user": user,
-	})
-}
-
-func GetAllAttendance(c *gin.Context) {
-	attendance := []models.Attendance{}
-	initializers.DB.Find(&attendance)
-	c.JSON(http.StatusOK, attendance)
-}
-
-func GetUserAttendance(c *gin.Context) {
-	id := c.Param("id")
-	attendance := []models.Attendance{}
-	initializers.DB.Find(&attendance, "user_id=?", id)
-	c.JSON(http.StatusOK, attendance)
 }
 
 func CheckOut(c *gin.Context) {
-	var attendance models.Attendance
-	var user models.User
+	attendance, err, status := services.CheckOut(c)
+	if err !=  nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, attendance)
+	}
+}
 
-	id := c.Param("id")
-	initializers.DB.First(&user, id)
-	initializers.DB.Last(&attendance, "user_id=?", id)
+func GetAllAttendance(c *gin.Context) {
+	attendances, err, status := services.GetAllAttendance(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, attendances)
+	}
+}
 
-	checkoutTime := time.Now()
-
-	// update attendance
-	initializers.DB.Model(&attendance).Updates(
-		models.Attendance{
-			CheckoutTime: checkoutTime,
-		},
-	)
-
-	initializers.DB.Model(&user).Association("Attendance").Append(&attendance)
-
-	// json, err := json.Marshal(user)
-	// if err != nil {
-	// 	fmt.Println("Entering error block")
-	// }
-	// fmt.Println(string(json))
-
-	c.JSON(http.StatusOK, gin.H{
-		"user": user,
-	})
+func GetUserAttendance(c *gin.Context) {
+	attendance, err, status := services.GetUserAttendance(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(status, attendance)
+	}
 }
 
 func UpdateAttendance(c *gin.Context) {
@@ -124,5 +57,16 @@ func UpdateAttendance(c *gin.Context) {
 		})
 	} else {
 		c.JSON(status, attendance)
+	}
+}
+
+func DeleteAttendance(c *gin.Context) {
+	err, status := services.DeleteAttendance(c)
+	if err != nil {
+		c.JSON(status, gin.H{
+			"message": err.Error(),
+		})
+	} else {
+		c.Status(200)
 	}
 }

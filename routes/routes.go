@@ -33,6 +33,7 @@ func Routes(router *gin.Engine) {
 	attendanceRouter := router.Group("/attendance")
 	{
 		attendanceRouter.PUT("/update-attendance/:id",  controllers.UpdateAttendance)
+		attendanceRouter.POST("/delete/:id",  controllers.DeleteAttendance)
 	}
 
 	router.POST("/login", controllers.Login)
